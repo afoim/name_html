@@ -3,4 +3,4 @@
 
 # [Web_Demo](https://n.afo.im/)
 
-# [安卓APK](https://github.com/afoim/name_html/releases/tag/0.2.1)
+# [安卓APK](https://github.com/afoim/name_html/releases)
