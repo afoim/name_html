@@ -106,12 +106,12 @@
         }
 
         .list-item {
-            padding: 15px;
+            padding: 10px;
             border: 2px solid var(--primary-color);
             cursor: pointer;
             transition: all var(--transition-speed);
             border-radius: 8px;
-            box-shadow: 0 4px 8px var(--shadow-color);
+            box-shadow: 0 2px 4px var(--shadow-color);
             background-color: var(--list-item-background-color);
             text-align: center;
             font-weight: 600;
@@ -201,6 +201,23 @@
             font-weight: 600;
         }
 
+        .zoom-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .zoom-control input {
+            width: 60%;
+            margin: 0 10px;
+        }
+
+        .zoom-control label {
+            width: 40%;
+            text-align: right;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -222,6 +239,21 @@
             .config-actions button {
                 flex: 1 1 100%;
                 max-width: none;
+            }
+
+            .zoom-control {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .zoom-control input {
+                width: 100%;
+                margin: 10px 0;
+            }
+
+            .zoom-control label {
+                width: 100%;
+                text-align: left;
             }
         }
     </style>
@@ -249,6 +281,14 @@
         <textarea id="name-input" rows="5" placeholder="每行一个名字..."></textarea>
         <input type="text" id="config-name" placeholder="配置名称">
         <select id="config-select"></select>
+        <div class="zoom-control">
+            <label for="grid-zoom-slider">名单布局缩放：</label>
+            <input type="range" id="grid-zoom-slider" min="80" max="200" value="120">
+        </div>
+        <div class="zoom-control">
+            <label for="font-size-slider">字体大小调整：</label>
+            <input type="range" id="font-size-slider" min="12" max="36" value="16">
+        </div>
         <div class="config-actions">
             <button onclick="saveConfig()"><i class="fas fa-save"></i>保存配置</button>
             <button onclick="loadConfig()"><i class="fas fa-folder-open"></i>加载配置</button>
@@ -260,9 +300,52 @@
 
 <div id="message"></div>
 
+
 <script>
     const configs = JSON.parse(localStorage.getItem('configs') || '{}');
-    let clearButtonClicked = false; // 用于追踪按钮状态
+    let clearButtonClicked = false;
+
+    function updateZoom() {
+        const gridZoomLevel = document.getElementById('grid-zoom-slider').value;
+        const fontSizeLevel = document.getElementById('font-size-slider').value;
+        const nameList = document.getElementById('name-list');
+        nameList.style.gridTemplateColumns = `repeat(auto-fill, minmax(${gridZoomLevel}px, 1fr))`;
+        nameList.style.fontSize = `${fontSizeLevel}px`;
+    }
+
+    function renderNameList(names) {
+        const nameList = document.getElementById('name-list');
+        nameList.innerHTML = '';
+        names.forEach(name => {
+            const listItem = document.createElement('div');
+            listItem.className = 'list-item';
+            listItem.textContent = name;
+
+            listItem.addEventListener('click', () => {
+                listItem.classList.toggle('checked');
+                sortNameList();
+                updateAttendance();
+            });
+
+            nameList.appendChild(listItem);
+        });
+        updateAttendance();
+        updateZoom();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setInterval(updateTime, 1000);
+        updateTime();
+        updateConfigSelect();
+
+        document.getElementById('grid-zoom-slider').addEventListener('input', updateZoom);
+        document.getElementById('font-size-slider').addEventListener('input', updateZoom);
+    });
+
+    function toggleConfig() {
+        const configContainer = document.getElementById('config-container');
+        configContainer.style.display = configContainer.style.display === 'none' ? 'block' : 'none';
+    }
 
     function updateAttendance() {
         const total = document.querySelectorAll('.list-item').length;
