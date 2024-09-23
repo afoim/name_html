@@ -4,11 +4,11 @@ android {
     compileSdkVersion 31
 
     defaultConfig {
-        applicationId "com.example.app"
+        applicationId "com.acofork.names"
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 1
-        versionName "0.2.1"
+        versionName "0.3.0"
     }
     buildTypes {
         release {

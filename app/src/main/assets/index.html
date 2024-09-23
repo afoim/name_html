@@ -3,352 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>点名表</title>
+    <title>智能点名表</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
-        /* 样式同之前 */
-        /* ...（这里省略之前的样式）... */
-        #modal {
-    display: none; /* 初始隐藏 */
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-}
-
-#modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-#modal button {
-    margin-top: 10px;
-}
-:root {
-    --background-color: #f5f5f5;
-    --container-background-color: #fff;
-    --text-color: #333;
-    --button-background-color: #007bff;
-    --button-hover-background-color: #0056b3;
-    --list-item-background-color: #f9f9f9;
-    --checked-item-background-color: #e0e0e0;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --time-font-size: 1.5rem;
-    --time-font-weight: bold;
-}
-
-[data-theme="dark"] {
-    --background-color: #121212;
-    --container-background-color: #1e1e1e;
-    --text-color: #ffffff;
-    --button-background-color: #1a73e8;
-    --button-hover-background-color: #1669c1;
-    --list-item-background-color: #2c2c2c;
-    --checked-item-background-color: #444;
-    --shadow-color: rgba(0, 0, 0, 0.3);
-}
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    margin: 0;
-    padding: 20px;
-    transition: background-color 0.3s, color 0.3s;
-    line-height: 1.6;
-}
-
-.container {
-    position: relative; /* 确保配置按钮放置在容器内 */
-    max-width: 95%;
-    width: 100%;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: var(--container-background-color);
-    border-radius: 8px;
-    box-shadow: 0 4px 8px var(--shadow-color);
-}
-
-h1 {
-    text-align: center;
-    color: var(--text-color);
-    margin-bottom: 1rem;
-    font-size: 2rem;
-}
-
-.actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.actions button {
-    flex: 1;
-    min-width: 60px;
-    max-width: 200px;
-    background-color: var(--button-background-color);
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-.actions button:hover {
-    background-color: var(--button-hover-background-color);
-    transform: translateY(-2px);
-}
-
-.list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 10px;
-    padding: 0;
-    margin: 0;
-}
-
-.list-item {
-    padding: 10px;
-    border: 1px solid #ddd;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px var(--shadow-color);
-    background-color: var(--list-item-background-color);
-    text-align: center;
-}
-
-.list-item.checked {
-    background-color: var(--checked-item-background-color);
-    text-decoration: line-through;
-}
-
-.list-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px var(--shadow-color);
-}
-
-.time-container {
-    text-align: center;
-    font-size: var(--time-font-size);
-    font-weight: var(--time-font-weight);
-    margin-bottom: 20px;
-    color: var(--text-color);
-}
-
-#attendance-container {
-    text-align: center;
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
-.date {
-    font-size: 1.2rem;
-    font-weight: normal;
-}
-
-.time {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.input-container {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-#name-input {
-    width: 100%;
-    height: 100px;
-}
-
-/* 配置区域 */
-#config-container {
-    display: none; /* 初始状态隐藏 */
-    padding: 10px;
-    background-color: var(--container-background-color);
-    border-radius: 8px;
-    box-shadow: 0 2px 5px var(--shadow-color);
-    margin-top: 20px;
-}
-
-#config-container textarea, #config-container input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    box-shadow: inset 0 1px 3px var(--shadow-color);
-    font-size: 1rem;
-    transition: box-shadow 0.3s, border-color 0.3s;
-}
-
-#config-container button {
-    background-color: var(--button-background-color);
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
-#config-container button:hover {
-    background-color: var(--button-hover-background-color);
-    transform: translateY(-2px);
-}
-
-@media (max-width: 600px) {
-    body {
-        padding: 10px;
-    }
-
-    .container {
-        padding: 15px;
-    }
-
-    h1 {
-        font-size: 1.5rem;
-    }
-
-    .actions button {
-        font-size: 0.9rem;
-    }
-
-    .list-item {
-        font-size: 0.9rem;
-    }
-
-    .time-container {
-        font-size: 1.2rem;
-    }
-
-    #attendance-container {
-        font-size: 1rem;
-    }
-}
-
-#toggle-config {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: var(--button-background-color);
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.3s, transform 0.2s;
-    z-index: 10;
-}
-
-#toggle-config:hover {
-    background-color: var(--button-hover-background-color);
-    transform: translateY(-2px);
-}
-        #modal {
-            display: none; /* 初始隐藏 */
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-        }
-
-        #modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        #modal button {
-            margin-top: 10px;
-        }
-
         :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5a623;
             --background-color: #f5f5f5;
             --container-background-color: #fff;
             --text-color: #333;
-            --button-background-color: #007bff;
-            --button-hover-background-color: #0056b3;
+            --button-background-color: #4a90e2;
+            --button-hover-background-color: #3a78c2;
             --list-item-background-color: #f9f9f9;
             --checked-item-background-color: #e0e0e0;
             --shadow-color: rgba(0, 0, 0, 0.1);
-            --time-font-size: 1.5rem;
-            --time-font-weight: bold;
+            --transition-speed: 0.3s;
         }
 
-        /* ...（省略其他样式）... */
+        [data-theme="dark"] {
+            --primary-color: #3a78c2;
+            --secondary-color: #d4890e;
+            --background-color: #121212;
+            --container-background-color: #1e1e1e;
+            --text-color: #ffffff;
+            --button-background-color: #3a78c2;
+            --button-hover-background-color: #2a68b2;
+            --list-item-background-color: #2c2c2c;
+            --checked-item-background-color: #444;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
 
+        * {
+            box-sizing: border-box;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: var(--container-background-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px var(--shadow-color);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background-color: var(--button-background-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all var(--transition-speed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            background-color: var(--button-hover-background-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow-color);
+        }
+
+        button i {
+            margin-right: 8px;
+        }
+
+        .list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            padding: 0;
+            margin: 0;
+        }
+
+        .list-item {
+            padding: 15px;
+            border: 2px solid var(--primary-color);
+            cursor: pointer;
+            transition: all var(--transition-speed);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px var(--shadow-color);
+            background-color: var(--list-item-background-color);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .list-item.checked {
+            background-color: var(--checked-item-background-color);
+            text-decoration: line-through;
+            border-color: var(--secondary-color);
+        }
+
+        .list-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 12px var(--shadow-color);
+        }
+
+        .time-container {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        #attendance-container {
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+
+        #config-container {
+            background-color: var(--container-background-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px var(--shadow-color);
+            margin-top: 20px;
+            padding: 20px;
+            display: none;
+        }
+
+        #config-container textarea,
+        #config-container input,
+        #config-container select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: var(--list-item-background-color);
+            color: var(--text-color);
+            transition: all var(--transition-speed);
+        }
+
+        #config-container textarea:focus,
+        #config-container input:focus,
+        #config-container select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+        }
+
+        .config-actions {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .config-actions button {
+            flex: 1 1 200px;
+            max-width: 200px;
+        }
+
+        #message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px var(--shadow-color);
+            display: none;
+            z-index: 1000;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .actions button {
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
+
+            .list-item {
+                font-size: 0.9rem;
+            }
+
+            .config-actions button {
+                flex: 1 1 100%;
+                max-width: none;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>点名表</h1>
-    <button id="toggle-config" onclick="toggleConfig()">配置</button>
+    <h1>智能点名表</h1>
     <div class="time-container">
-        <span id="date" class="date"></span>
+        <span id="date"></span>
         <br>
-        <span id="time" class="time"></span>
+        <span id="time"></span>
     </div>
 
     <div id="attendance-container">出勤人数: 0/0</div>
 
-    <div id="config-container">
-        <div class="input-container">
-            <textarea id="name-input" placeholder="每行一个名字..."></textarea>
-            <br>
-            <input type="text" id="config-name" placeholder="配置名称">
-            <button onclick="saveConfig()">保存配置</button>
-        </div>
-
-        <div class="actions">
-            <button onclick="selectAll()">全选</button>
-            <button onclick="deselectAll()">取消</button>
-            <button onclick="toggleTheme()">黑夜/白昼</button>
-            <button onclick="loadConfig()">加载配置</button>
-            <select id="config-select"></select>
-            <button onclick="deleteConfig()">删除配置</button>
-            <button onclick="clearAllData()">抹掉所有数据</button>
-        </div>
-
+    <div class="actions">
+        <button onclick="selectAll()"><i class="fas fa-check-double"></i>全选</button>
+        <button onclick="deselectAll()"><i class="fas fa-times"></i>取消</button>
+        <button onclick="toggleTheme()"><i class="fas fa-adjust"></i>切换主题</button>
+        <button onclick="toggleConfig()"><i class="fas fa-cog"></i>配置</button>
     </div>
 
     <div id="name-list" class="list"></div>
 
-    <!-- 消息提示 -->
-    <div id="message"></div>
+    <div id="config-container">
+        <textarea id="name-input" rows="5" placeholder="每行一个名字..."></textarea>
+        <input type="text" id="config-name" placeholder="配置名称">
+        <select id="config-select"></select>
+        <div class="config-actions">
+            <button onclick="saveConfig()"><i class="fas fa-save"></i>保存配置</button>
+            <button onclick="loadConfig()"><i class="fas fa-folder-open"></i>加载配置</button>
+            <button onclick="deleteConfig()"><i class="fas fa-trash-alt"></i>删除配置</button>
+            <button onclick="clearAllData()"><i class="fas fa-eraser"></i>抹掉所有数据</button>
+        </div>
+    </div>
 </div>
+
+<div id="message"></div>
 
 <script>
     const configs = JSON.parse(localStorage.getItem('configs') || '{}');
+    let clearButtonClicked = false; // 用于追踪按钮状态
 
     function updateAttendance() {
         const total = document.querySelectorAll('.list-item').length;
         const checked = document.querySelectorAll('.list-item.checked').length;
-        document.getElementById('attendance-container').textContent = '出勤人数: ' + checked + '/' + total;
+        document.getElementById('attendance-container').textContent = `出勤人数: ${checked}/${total}`;
     }
 
     function showMessage(msg) {
@@ -357,7 +277,7 @@ h1 {
         messageDiv.style.display = 'block';
         setTimeout(() => {
             messageDiv.style.display = 'none';
-        }, 3000); // 3秒后自动隐藏
+        }, 3000);
     }
 
     function saveConfig() {
@@ -392,19 +312,48 @@ h1 {
         showMessage('配置已删除');
     }
 
-    function clearAllData() {
+function clearAllData() {
+    const clearButton = document.querySelector('button[onclick="clearAllData()"]');
+    if (!clearButtonClicked) {
+        clearButton.textContent = '确认抹掉';
+        clearButton.style.backgroundColor = '#e74c3c'; // 变红
+        clearButtonClicked = true;
+    } else {
         localStorage.removeItem('configs');
         Object.keys(configs).forEach(config => delete configs[config]);
         updateConfigSelect();
         showMessage('所有数据已抹掉');
-        renderNameList([]); // 清空显示的名单
+        renderNameList([]);
+        resetClearButton(); // 重置按钮状态
+        }
     }
+
+    function resetClearButton() {
+const clearButton = document.querySelector('button[onclick="clearAllData()"]');
+clearButton.textContent = '抹掉所有数据';
+clearButton.style.backgroundColor = ''; // 恢复原始颜色
+clearButtonClicked = false;
+}
+
+// 全局监听点击事件
+document.addEventListener('click', (event) => {
+const clearButton = document.querySelector('button[onclick="clearAllData()"]');
+
+// 检查点击是否发生在 "确认抹掉" 按钮以外的元素上
+if (clearButtonClicked && !clearButton.contains(event.target)) {
+    resetClearButton(); // 点击其他区域时重置按钮
+}
+});
 
     function updateConfigSelect() {
         const select = document.getElementById('config-select');
         select.innerHTML = '';
         const options = Object.keys(configs).map(name => `<option value="${name}">${name}</option>`).join('');
         select.innerHTML = options;
+
+        if (Object.keys(configs).length === 0) {
+            select.innerHTML = '<option value="">无配置文件，请添加...</option>';
+        }
     }
 
     function renderNameList(names) {
@@ -440,34 +389,33 @@ h1 {
 
     function updateTime() {
         const now = new Date();
-        document.getElementById('date').textContent = now.toLocaleDateString();
-        document.getElementById('time').textContent = now.toLocaleTimeString();
+        document.getElementById('date').textContent = now.toLocaleDateString('zh-CN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('time').textContent = now.toLocaleTimeString('zh-CN');
+    }
+
+    function selectAll() {
+        document.querySelectorAll('.list-item').forEach(item => {
+            item.classList.add('checked');
+        });
+        updateAttendance();
+    }
+
+    function deselectAll() {
+        document.querySelectorAll('.list-item').forEach(item => {
+            item.classList.remove('checked');
+        });
+        updateAttendance();
+    }
+
+    function toggleTheme() {
+        document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
     }
 
     document.addEventListener('DOMContentLoaded', () => {
         setInterval(updateTime, 1000);
         updateTime();
         updateConfigSelect();
-        toggleConfig();
     });
-    function selectAll() {
-    document.querySelectorAll('.list-item').forEach(item => {
-        item.classList.add('checked');
-    });
-    updateAttendance();
-}
-
-function deselectAll() {
-    document.querySelectorAll('.list-item').forEach(item => {
-        item.classList.remove('checked');
-    });
-    updateAttendance();
-}
-
-function toggleTheme() {
-    document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
-}
-
 </script>
 
 </body>
