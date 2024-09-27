@@ -208,6 +208,11 @@
             text-align: right;
         }
 
+        #reset-defaults {
+            background-color: var(--secondary-color);
+            margin-top: 10px;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -298,9 +303,10 @@ a:hover {
             <button onclick="deleteConfig()"><i class="fas fa-trash-alt"></i>删除配置</button>
             <button onclick="clearAllData()"><i class="fas fa-eraser"></i>抹掉所有数据</button>
         </div>
+        <button id="reset-defaults" onclick="resetDefaults()"><i class="fas fa-undo"></i>恢复默认设置</button>
     </div>
     <div id="version" style="text-align: center; margin-top: 20px; font-size: 0.9rem; color: var(--text-color);">
-        版本号: 0.4.2 <a href="https://github.com/afoim/name_html">Github</a>
+        版本号: 0.4.3 <a href="https://github.com/afoim/name_html">Github</a>
     </div>
 
 </div>
@@ -313,11 +319,32 @@ a:hover {
     let clearButtonClicked = false;
 
     function updateZoom() {
-        const gridZoomLevel = document.getElementById('grid-zoom-slider').value;
-        const fontSizeLevel = document.getElementById('font-size-slider').value;
-        const nameList = document.getElementById('name-list');
-        nameList.style.gridTemplateColumns = `repeat(auto-fill, minmax(${gridZoomLevel}px, 1fr))`;
-        nameList.style.fontSize = `${fontSizeLevel}px`;
+    const gridZoomLevel = document.getElementById('grid-zoom-slider').value;
+    const fontSizeLevel = document.getElementById('font-size-slider').value;
+    const nameList = document.getElementById('name-list');
+    nameList.style.gridTemplateColumns = `repeat(auto-fill, minmax(${gridZoomLevel}px, 1fr))`;
+    nameList.style.fontSize = `${fontSizeLevel}px`;
+
+    // 保存设置到 localStorage
+    localStorage.setItem('gridZoomLevel', gridZoomLevel);
+    localStorage.setItem('fontSizeLevel', fontSizeLevel);
+}
+
+function loadSettings() {
+    const gridZoomLevel = localStorage.getItem('gridZoomLevel') || 120;
+    const fontSizeLevel = localStorage.getItem('fontSizeLevel') || 16;
+
+    document.getElementById('grid-zoom-slider').value = gridZoomLevel;
+    document.getElementById('font-size-slider').value = fontSizeLevel;
+
+    updateZoom();
+}
+
+    function resetDefaults() {
+        document.getElementById('grid-zoom-slider').value = 120;
+        document.getElementById('font-size-slider').value = 16;
+        updateZoom();
+        showMessage('已恢复默认设置');
     }
 
     function renderNameList(names) {
@@ -358,13 +385,19 @@ a:hover {
 }
 
 
-    document.addEventListener('DOMContentLoaded', () => {
-        setInterval(updateTime, 1000);
-        updateTime();
-        updateConfigSelect();
+document.addEventListener('DOMContentLoaded', () => {
+    setInterval(updateTime, 1000);
+    updateTime();
+    updateConfigSelect();
 
         document.getElementById('grid-zoom-slider').addEventListener('input', updateZoom);
         document.getElementById('font-size-slider').addEventListener('input', updateZoom);
+
+            // 加载缩放设置
+    loadSettings();
+
+document.getElementById('grid-zoom-slider').addEventListener('input', updateZoom);
+document.getElementById('font-size-slider').addEventListener('input', updateZoom);
     });
 
     function toggleConfig() {
