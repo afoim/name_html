@@ -282,8 +282,9 @@ a:hover {
         <button onclick="deselectAll()"><i class="fas fa-times"></i>取消</button>
         <button onclick="toggleTheme()"><i class="fas fa-adjust"></i>切换主题</button>
         <button onclick="toggleConfig()"><i class="fas fa-cog"></i>配置</button>
-    </div>
 
+    </div>
+    <input type="file" id="import-input" style="display: none" accept=".json">
     <div id="name-list" class="list"></div>
 
     <div id="config-container">
@@ -303,6 +304,8 @@ a:hover {
             <button onclick="loadConfig()"><i class="fas fa-folder-open"></i>加载配置</button>
             <button onclick="deleteConfig()"><i class="fas fa-trash-alt"></i>删除配置</button>
             <button onclick="clearAllData()"><i class="fas fa-eraser"></i>抹掉所有数据</button>
+            <button onclick="exportData()"><i class="fas fa-file-export"></i>导出数据</button>
+            <button onclick="importData()"><i class="fas fa-file-import"></i>导入数据</button>
         </div>
         <button id="reset-defaults" onclick="resetDefaults()"><i class="fas fa-undo"></i>恢复默认设置</button>
     </div>
@@ -554,6 +557,91 @@ if (clearButtonClicked && !clearButton.contains(event.target)) {
     document.getElementById('grid-zoom-slider').addEventListener('input', updateZoom);
     document.getElementById('font-size-slider').addEventListener('input', updateZoom);
 });
+
+// 添加导出数据功能
+function exportData() {
+    // 收集所有需要导出的数据
+    const exportData = {
+        configs: configs,
+        settings: {
+            gridZoomLevel: localStorage.getItem('gridZoomLevel'),
+            fontSizeLevel: localStorage.getItem('fontSizeLevel')
+        },
+        checkedStates: {}
+    };
+    
+    // 收集所有名字的勾选状态
+    Object.values(configs).forEach(names => {
+        names.forEach(name => {
+            exportData.checkedStates[name] = JSON.parse(localStorage.getItem(name)) || false;
+        });
+    });
+
+    // 创建并下载JSON文件
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `名单配置_${new Date().toLocaleDateString()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showMessage('数据导出成功');
+}
+
+// 添加导入数据功能
+function importData() {
+    document.getElementById('import-input').click();
+}
+
+// 处理文件导入
+document.getElementById('import-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const importedData = JSON.parse(e.target.result);
+            
+            // 导入配置
+            Object.assign(configs, importedData.configs);
+            localStorage.setItem('configs', JSON.stringify(configs));
+            
+            // 导入设置
+            if (importedData.settings) {
+                localStorage.setItem('gridZoomLevel', importedData.settings.gridZoomLevel);
+                localStorage.setItem('fontSizeLevel', importedData.settings.fontSizeLevel);
+            }
+            
+            // 导入勾选状态
+            if (importedData.checkedStates) {
+                Object.entries(importedData.checkedStates).forEach(([name, state]) => {
+                    localStorage.setItem(name, state);
+                });
+            }
+            
+            // 更新界面
+            updateConfigSelect();
+            loadSettings();
+            const firstConfigName = Object.keys(importedData.configs)[0];
+            if (firstConfigName) {
+                renderNameList(importedData.configs[firstConfigName]);
+            }
+            
+            showMessage('数据导入成功');
+        } catch (error) {
+            showMessage('导入失败：无效的文件格式');
+            console.error('Import error:', error);
+        }
+    };
+    reader.readAsText(file);
+    this.value = ''; // 清空input，允许重复导入相同文件
+});
+
 </script>
 
 </body>
