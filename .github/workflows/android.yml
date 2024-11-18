@@ -6,7 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-# 添加权限配置
 permissions:
   contents: write
   issues: write
@@ -46,6 +45,22 @@ jobs:
         chmod +x ./gradlew
         ./gradlew assembleRelease
 
+    # 添加调试步骤
+    - name: Debug - List Build Directory
+      run: |
+        echo "Listing app/build/outputs directory:"
+        ls -R app/build/outputs
+        echo "APK file size:"
+        find app/build/outputs -name "*.apk" -exec ls -l {} \;
+
+    # 重命名并移动 APK 文件
+    - name: Prepare Release Asset
+      run: |
+        mkdir -p releases
+        find app/build/outputs -name "*.apk" -exec cp {} releases/app-release-${{ env.VERSION_NAME }}.apk \;
+        echo "Checking copied APK:"
+        ls -l releases/
+
     - name: Create Release
       id: create-release
       uses: softprops/action-gh-release@v1
@@ -54,6 +69,6 @@ jobs:
         name: "Release v${{ env.VERSION_NAME }}"
         draft: false
         prerelease: false
-        files: app/build/outputs/apk/release/app-release.apk
+        files: releases/app-release-${{ env.VERSION_NAME }}.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
