@@ -32,7 +32,9 @@ jobs:
 
     # 构建 APK
     - name: Build Release APK
-      run: ./gradlew assembleRelease
+      run: |
+        chmod +x ./gradlew
+        ./gradlew assembleRelease
 
     # 上传生成的 APK 作为构建工件
     - name: Upload APK
