@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build:
-    name: Build and Publish Release APK
+    name: Build and Publish Debug APK
     runs-on: ubuntu-latest
 
     steps:
@@ -40,24 +40,20 @@ jobs:
         echo "VERSION_NAME=${VERSION_NAME}" >> $GITHUB_ENV
         echo "VERSION_CODE=${VERSION_CODE}" >> $GITHUB_ENV
 
-    - name: Build Release APK
+    - name: Build Debug APK
       run: |
         chmod +x ./gradlew
-        ./gradlew assembleRelease
+        ./gradlew assembleDebug
 
-    # 添加调试步骤
     - name: Debug - List Build Directory
       run: |
         echo "Listing app/build/outputs directory:"
-        ls -R app/build/outputs
-        echo "APK file size:"
-        find app/build/outputs -name "*.apk" -exec ls -l {} \;
+        ls -R app/build/outputs/apk/debug/
 
-    # 重命名并移动 APK 文件
-    - name: Prepare Release Asset
+    - name: Prepare Debug APK
       run: |
         mkdir -p releases
-        find app/build/outputs -name "*.apk" -exec cp {} releases/app-release-${{ env.VERSION_NAME }}.apk \;
+        cp app/build/outputs/apk/debug/app-debug.apk releases/app-debug-${{ env.VERSION_NAME }}.apk
         echo "Checking copied APK:"
         ls -l releases/
 
@@ -69,6 +65,6 @@ jobs:
         name: "Release v${{ env.VERSION_NAME }}"
         draft: false
         prerelease: false
-        files: releases/app-release-${{ env.VERSION_NAME }}.apk
+        files: releases/app-debug-${{ env.VERSION_NAME }}.apk
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
